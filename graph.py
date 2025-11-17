@@ -1,6 +1,7 @@
+#Julia Andreis, Kauan Gross e Tobias Klein
+
 import heapq
-from math import dist
-from turtle import update
+import time
 
 class Graph:
     def __init__(self, graph: dict | None = None):
@@ -71,21 +72,23 @@ class Graph:
 
         for nbrs in range(len(nodes) - 1):
             updated = False
-
             for u in self.graph:
                 for v, weight in self.graph[u].items():
                     if distances[u] + weight < distances[v]:
                         distances[v] = distances[u] + weight
                         prev[v] = u
                         updated = True
+            
             # Se nenhuma aresta foi relaxada, pode parar antes
             if not updated:
                 break
-         
+
         # Verifica ciclos de peso negativo
+        for u in self.graph:
             for v, weight in self.graph[u].items():
                 if distances[u] + weight < distances[v]:
                     raise ValueError("O grafo contém um ciclo de peso negativo.")
+
 
         self._cache_bellman = (distances, prev)
         return distances, prev
@@ -98,6 +101,10 @@ class Graph:
 
         path = []
         cur = target
+
+        # Se não existe caminho, devolve caminho vazio
+        if distances[target] == float("inf"):
+            return [], float("inf")
         
         while cur is not None:
             path.append(cur)
@@ -133,6 +140,36 @@ def graph3() -> "Graph":
     g.graph["F"] = {}  # nó isolado
     return g
 
+def graphTestTime() -> "Graph":
+    return Graph({
+        "A": {"B": 2, "C": 5, "D": 3},
+        "B": {"A": 2, "E": 3, "F": 4},
+        "C": {"A": 5, "F": 2, "G": 6},
+        "D": {"A": 3, "G": 2, "H": 4},
+        "E": {"B": 3, "I": 5, "J": 2},
+        "F": {"B": 4, "C": 2, "J": 3, "K": 4},
+        "G": {"C": 6, "D": 2, "K": 1, "L": 3},
+        "H": {"D": 4, "L": 2, "M": 5},
+        "I": {"E": 5, "M": 3, "N": 4},
+        "J": {"E": 2, "F": 3, "N": 2, "O": 4},
+        "K": {"F": 4, "G": 1, "O": 3, "P": 2},
+        "L": {"G": 3, "H": 2, "P": 4, "Q": 3},
+        "M": {"H": 5, "I": 3, "Q": 2, "R": 4},
+        "N": {"I": 4, "J": 2, "R": 3, "S": 5},
+        "O": {"J": 4, "K": 3, "S": 2, "T": 4},
+        "P": {"K": 2, "L": 4, "T": 3, "U": 5},
+        "Q": {"L": 3, "M": 2, "U": 2, "V": 4},
+        "R": {"M": 4, "N": 3, "V": 3, "W": 2},
+        "S": {"N": 5, "O": 2, "W": 3, "X": 4},
+        "T": {"O": 4, "P": 3, "X": 2, "Y": 5},
+        "U": {"P": 5, "Q": 2, "Y": 3, "Z": 4},
+        "V": {"Q": 4, "R": 3, "Z": 2},
+        "W": {"R": 2, "S": 3, "Z": 3},
+        "X": {"S": 4, "T": 2, "Z": 3},
+        "Y": {"T": 5, "U": 3, "Z": 2},
+        "Z": {}
+    })
+
 def test_dijkstra(graph):
     distances, _ = graph.dijkstra("A")
     print("Distâncias mínimas a partir do nó A:")
@@ -143,9 +180,9 @@ def test_dijkstra(graph):
     path, dist = graph.shortest_path("A", "D", "dijkstra")
     print()
     if path:
-        print(f"Caminho mínimo A → F: {' -> '.join(path)} (distância = {dist:.2f})")
+        print(f"Caminho mínimo A → D: {' -> '.join(path)} (distância = {dist:.2f})")
     else:
-        print("Não há caminho de A até F.")
+        print("Não há caminho de A até D.")
 
 def test_bellman_ford_(graph):
     # Teste do Bellman-Ford
@@ -159,9 +196,9 @@ def test_bellman_ford_(graph):
     path, dist = graph.shortest_path("A", "D", "bellman-ford")
     print()
     if path:
-        print(f"Caminho mínimo A → F: {' -> '.join(path)} (distância = {dist:.2f})")
+        print(f"Caminho mínimo A → D: {' -> '.join(path)} (distância = {dist:.2f})")
     else:
-        print("Não há caminho de A até F.")
+        print("Não há caminho de A até D.")
 
 
 def teste_dijkstra_com_armadilha(graph: "Graph"):
@@ -232,6 +269,24 @@ def teste_bellman_ford_com_armadilha(graph: "Graph"):
     else:
         print("❌ Resultado INCORRETO (achou caminho onde não existe).")
 
+def benchmark():
+    graph = graphTestTime()
+
+    # --- Teste Dijkstra ---
+    start = time.perf_counter()
+    test_dijkstra(graph)
+    end = time.perf_counter()
+    dijkstra_time = (end - start) * 1000
+
+    # --- Teste Bellman-Ford ---
+    start = time.perf_counter()
+    test_bellman_ford_(graph)
+    end = time.perf_counter()
+    bellman_time = (end - start) * 1000
+
+    print(f"Dijkstra: {dijkstra_time:.3f} ms")
+    print(f"Bellman-Ford: {bellman_time:.3f} ms")
+
 def main():
     print("\n----------------------------------\n----------Teste Dijkstra com peso negativo - deve falhar:----------")
     test_dijkstra(graph1())
@@ -241,7 +296,10 @@ def main():
     print('\n----------------------------------\n----------Teste Dijkstra e Bellman-Ford com armadilha:----------')
     teste_dijkstra_com_armadilha(graph3())
     teste_bellman_ford_com_armadilha(graph3())
-
+    
+    print("\n\nBenchmark\n")
+    for _ in range(3):
+        benchmark()
 
 
 if __name__ == "__main__":

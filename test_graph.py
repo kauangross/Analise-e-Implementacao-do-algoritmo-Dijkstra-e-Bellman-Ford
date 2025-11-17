@@ -16,8 +16,8 @@ def test_dijkstra_caminho_errado_com_peso_negativo(graph1):
     Dijkstra deve falhar (dar resultado incorreto) quando há pesos negativos.
     """
     path, dist = graph1.shortest_path("A", "D", "dijkstra")
-    # O algoritmo não deve retornar -1 (resultado incorreto)
-    # mas sim um valor incorreto diferente do Bellman-Ford
+    # O algoritmo não deve retornar -3 (resultado correto)
+    # mas sim um valor incorreto diferente do Bellman-Ford = -1
     assert path == ["A", "F", "B", "D"]
     assert pytest.approx(dist, rel=1e-3) == -3.0  # distância esperada
 
