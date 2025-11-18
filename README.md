@@ -1,21 +1,7 @@
 Este repositório contém a implementação dos algoritmos Dijkstra e Bellman–Ford, focado em estudo, entendimento e análise prática do comportamento de ambos.
 Os testes foram escritos utilizando pytest, permitindo validar os resultados e medir o tempo de execução de cada algoritmo em grafos de teste.
 
-▶️ Como Executar o Projeto
-Instale o Python 3.10+
-
-Clone o repositório:
-git clone https://github.com/SEU_USUARIO/SEU_REPO.git
-cd SEU_REPO
-
-Execute os testes:
-"pytest"
-O terminal exibirá os tempos e os resultados de cada algoritmo.
-
-Rode o arquivo principal:
-"python Graph.py"
-
-📌 Objetivo do Trabalho
+#📌 Objetivo do Trabalho
 Implementar os algoritmos Dijkstra e Bellman–Ford.
 Comparar os dois algoritmos.
 Entender o funcionamento interno de cada um:
